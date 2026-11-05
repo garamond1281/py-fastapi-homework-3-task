@@ -91,7 +91,7 @@ async def reset_password_complete(
     return MessageResponseSchema(message="Password reset successfully.")
 
 
-@router.post("/login/", status_code=status.HTTP_201_CREATED)
+@router.post("/login/", status_code=status.HTTP_200_OK)
 async def login(
         data: UserLoginRequestSchema,
         db: AsyncSession = Depends(get_db),
