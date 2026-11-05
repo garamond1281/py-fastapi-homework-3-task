@@ -97,19 +97,24 @@ async def complete_password_reset(session: AsyncSession, data: PasswordResetComp
     user = (await session.execute(user_stmt)).scalar_one_or_none()
     if user is None or not user.is_active:
         raise UserNotExistsError(f"A user with email {data.email} does not exist.")
+
     token = user.password_reset_token
     if token is None or token.token != data.token:
-        await session.delete(token)
-        await session.commit()
+        if token is not None:
+            await session.delete(token)
+            await session.commit()
         raise InvalidOrExpiredTokenError("Invalid email or token.")
+
     expires_at = cast(datetime, token.expires_at).replace(tzinfo=timezone.utc)
     if expires_at < datetime.now(timezone.utc):
-        await session.delete(token)
-        await session.commit()
+        if token is not None:
+            await session.delete(token)
+            await session.commit()
         raise InvalidOrExpiredTokenError("Invalid email or token.")
 
     user.password = data.password
-    await session.delete(token)
+    if token is not None:
+        await session.delete(token)
     await session.commit()
 
 
