@@ -116,7 +116,7 @@ async def login(
     return UserLoginResponseSchema(access_token=access_token, refresh_token=refresh_token)
 
 
-@router.post("/api/v1/accounts/refresh/")
+@router.post("/refresh/")
 async def refresh_access_token(
         data: TokenRefreshRequestSchema,
         db: AsyncSession = Depends(get_db),
